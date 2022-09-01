@@ -1,0 +1,10 @@
+[package]
+name = "wasm-memory"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+anyhow = "1.0"
+wasi-common = "0.40"
+wasmtime = "0.40"
+wasmtime-wasi = "0.40"
