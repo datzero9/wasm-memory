@@ -44,7 +44,7 @@ fn array_sum(input: Vec<u8>) -> Result<i32, anyhow::Error> {
     let memory = instance
         .get_memory(&mut store, MEMORY)
         .ok_or_else(|| anyhow::format_err!("failed to find `memory` export"))?;
-    let alloc_fn = instance.get_typed_func::<i32, i32, _>(&mut store, ALLOC_FN)?;
+    let alloc_fn = instance.get_typed_func::<i32, i32>(&mut store, ALLOC_FN)?;
 
     let guest_ptr_offset = alloc_fn.call(&mut store, input.len() as i32)?;
     unsafe {
@@ -52,7 +52,7 @@ fn array_sum(input: Vec<u8>) -> Result<i32, anyhow::Error> {
         raw.copy_from(input.as_ptr(), input.len());
     }
 
-    let array_sum_fn = instance.get_typed_func::<(i32, i32), i32, _>(&mut store, ARRAY_SUM_FN)?;
+    let array_sum_fn = instance.get_typed_func::<(i32, i32), i32>(&mut store, ARRAY_SUM_FN)?;
     let results = array_sum_fn.call(&mut store, (guest_ptr_offset, input.len() as i32))?;
     Ok(results)
 }
@@ -74,7 +74,7 @@ fn upper(input: String) -> Result<String, anyhow::Error> {
     let memory = instance
         .get_memory(&mut store, MEMORY)
         .ok_or_else(|| anyhow::format_err!("failed to find `memory` export"))?;
-    let alloc_fn = instance.get_typed_func::<i32, i32, _>(&mut store, ALLOC_FN)?;
+    let alloc_fn = instance.get_typed_func::<i32, i32>(&mut store, ALLOC_FN)?;
 
     let len = input.as_bytes().len() as i32;
     let guest_ptr_offset = alloc_fn.call(&mut store, len)?;
@@ -83,7 +83,7 @@ fn upper(input: String) -> Result<String, anyhow::Error> {
         raw.copy_from(input.as_ptr(), input.len());
     }
 
-    let upper_fn = instance.get_typed_func::<(i32, i32), i32, _>(&mut store, UPPER_FN)?;
+    let upper_fn = instance.get_typed_func::<(i32, i32), i32>(&mut store, UPPER_FN)?;
     let res_ptr = upper_fn.call(&mut store, (guest_ptr_offset, len))?;
 
     let data = memory
@@ -99,7 +99,7 @@ fn upper(input: String) -> Result<String, anyhow::Error> {
     };
     let res = String::from(str);
 
-    let dealloc_fn = instance.get_typed_func::<(i32, i32), (), _>(&mut store, DEALLOC_FN)?;
+    let dealloc_fn = instance.get_typed_func::<(i32, i32), ()>(&mut store, DEALLOC_FN)?;
     dealloc_fn.call(&mut store, (guest_ptr_offset, len))?;
 
     Ok(res)
